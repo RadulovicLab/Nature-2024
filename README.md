@@ -1,0 +1,1 @@
+This is the R code for scRNAseq data analysis for paper "Formation of Memory Assemblies through the DNA Sensing Tlr9 Pathway". Inputs are five 10x scRNAseq samples, raw fastq and matrix data were uploaded to GEO. 
