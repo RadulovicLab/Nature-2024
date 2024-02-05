@@ -1,26 +1,15 @@
 options(stringsAsFactors = FALSE)
 Sys.getenv('R_MAX_VSIZE')
 
-
-library(sctransform)
 library(Seurat)
 library(dplyr)
 library(cowplot)
 library(ggplot2)
-library(clusterProfiler)
-library(patchwork)
-library(KEGG.db)
-library(DOSE)
-library(org.Mm.eg.db)
-library(colorRamps)
-library(RColorBrewer)
-library(tidyr)
 library(SeuratWrappers)
 library(doBy)
 library(fgsea)
 library(data.table)
 library(pheatmap)
-library(viridis)
 library(gprofiler2)
 library(scDblFinder)
 library(SoupX)
@@ -144,9 +133,6 @@ TLR9.fourSamples.withDbltRemoved.withSoupX.anchors <- FindIntegrationAnchors(obj
 
 TLR9.fourSamples.withDbltRemoved.withSoupX.sct <- IntegrateData(anchorset = TLR9.fourSamples.withDbltRemoved.withSoupX.anchors, normalization.method = "SCT")
 
-saveRDS(TLR9.fourSamples.withDbltRemoved.withSoupX.sct, file = "TLR9.fourSamples.withDbltRemoved.withSoupX.sct.afterIntegrateData.rds")
-TLR9.fourSamples.withDbltRemoved.withSoupX.sct <- readRDS("TLR9.fourSamples.withDbltRemoved.withSoupX.sct.afterIntegrateData.rds")
-
 
 TLR9.fourSamples.withDbltRemoved.withSoupX.sct <- RunPCA(TLR9.fourSamples.withDbltRemoved.withSoupX.sct, npcs = 50, verbose = FALSE)
 
@@ -157,9 +143,6 @@ TLR9.fourSamples.withDbltRemoved.withSoupX.sct <- TLR9.fourSamples.withDbltRemov
   FindNeighbors(reduction = "pca", dims = 1:pc_num) %>%
   FindClusters(resolution = 0.5)
 
-saveRDS(TLR9.fourSamples.withDbltRemoved.withSoupX.sct, file = "TLR9.fourSamples.withDbltRemoved.withSoupX.sct.Final.rds")
-TLR9.fourSamples.withDbltRemoved.withSoupX.sct <- readRDS("TLR9.fourSamples.withDbltRemoved.withSoupX.sct.Final.rds")
-
 
 ####Cluster markers######################################
 cluster.ALLmarkers <- FindAllMarkers(TLR9.fourSamples.withDbltRemoved.withSoupX.sct, assay = "RNA", only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.25)
@@ -168,26 +151,16 @@ ordered.ALLmarkers <- cluster.ALLmarkers %>%
   group_by(cluster) %>%
   arrange(desc(avg_log2FC), .by_group = TRUE)
 
-write.table(ordered.ALLmarkers, "soupX_corrected_analysis/cluster_ALLmarkers.csv", sep = ",",row.names = F)
-
 
 
 filtered.markers <- cluster.ALLmarkers %>%
   group_by(cluster) %>%
   slice_max(n = 25, order_by = avg_log2FC)
 
-write.table(filtered.markers, "soupX_corrected_analysis/cluster_ALLmarkers_top20.csv", sep = ",",row.names = F)
-
-
-
 
 ####Differential analysis#######################################
 DefaultAssay(TLR9.fourSamples.withDbltRemoved.withSoupX.sct) <- "RNA"
 TLR9.fourSamples.withDbltRemoved.withSoupX.sct.GFPpos <- subset(TLR9.fourSamples.withDbltRemoved.withSoupX.sct, subset= `EGFP-gn` > 0)
-
-
-table(TLR9.fourSamples.withDbltRemoved.withSoupX.sct$orig.ident,TLR9.fourSamples.withDbltRemoved.withSoupX.sct$seurat_clusters)
-table(TLR9.fourSamples.withDbltRemoved.withSoupX.sct.GFPpos$orig.ident,TLR9.fourSamples.withDbltRemoved.withSoupX.sct.GFPpos$seurat_clusters)
 
 
 
